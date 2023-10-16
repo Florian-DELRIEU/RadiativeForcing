@@ -69,21 +69,27 @@ def temperature_US1976(z):
     # Mesosphere 2 (71 to ...)
     T_meso2 = 214.65
 
-    return np.piecewise(z_km,
-                        [z_km < z_trop,
-                         (z_km >= z_trop) & (z_km < z_tropopause),
-                         (z_km >= z_tropopause) & (z_km < z_strat1),
-                         (z_km >= z_strat1) & (z_km < z_strat2),
-                         (z_km >= z_strat2) & (z_km < z_stratopause),
-                         (z_km >= z_stratopause) & (z_km < z_meso1),
-                         z_km >= z_meso1],
-                        [lambda z: T0 - 6.5 * z,
-                         lambda z: T_tropopause,
-                         lambda z: T_strat1 + 1 * (z - z_tropopause),
-                         lambda z: T_strat2 + 2.8 * (z - z_strat1),
-                         lambda z: T_stratopause,
-                         lambda z: T_meso1 - 2.8 * (z - z_stratopause),
-                         lambda z: T_meso2 - 2 * (z - z_meso1)])
+    return np.piecewise(
+        z_km,
+        [
+            z_km < z_trop,
+            (z_km >= z_trop) & (z_km < z_tropopause),
+            (z_km >= z_tropopause) & (z_km < z_strat1),
+            (z_km >= z_strat1) & (z_km < z_strat2),
+            (z_km >= z_strat2) & (z_km < z_stratopause),
+            (z_km >= z_stratopause) & (z_km < z_meso1),
+            z_km >= z_meso1,
+        ],
+        [
+            lambda z: T0 - 6.5 * z,
+            lambda z: T_strat1,
+            lambda z: T_strat1 + 1 * (z - z_tropopause),
+            lambda z: T_strat2 + 2.8 * (z - z_strat1),
+            lambda z: T_meso1,
+            lambda z: T_meso1 - 2.8 * (z - z_stratopause),
+            lambda z: T_meso2 - 2 * (z - z_meso1),
+        ],
+    )
 
 
 # ==> CHOOSE HERE THE TEMPERATURE MODEL
@@ -103,8 +109,7 @@ def air_number_density(z):
 def cross_section_CO2(wavelength):
     LAMBDA_0 = 15.0e-6  # Band center in m
     exponent = -22.5 - 24 * np.abs((wavelength - LAMBDA_0) / LAMBDA_0)
-    sigma = 10 ** exponent
-    return sigma
+    return 10 ** exponent
 
 # ----------------------------------------------------------------------------------------------------------------------
 
